@@ -9,11 +9,12 @@ import types
 import time
 
 class Sse(object):
-    def __init__(self, retry=None):
+    def __init__(self, response_class=Response, retry=None):
+        self.response_class = response_class
         self.retry = retry
 
     def __call__(self, viewfunc):
-        response = Response()
+        response = self.response_class()
         if self.retry is not None:
             response.set_retry(self.retry)
 
@@ -36,13 +37,14 @@ class Sse(object):
         return _inner
 
 
-class StreamSse(object):
-    def __init__(self, retry=DEFAULT_RETRY_TIMEOUT, sleep=1):
+class StreamSse(Sse):
+    def __init__(self, response_class=Response, retry=DEFAULT_RETRY_TIMEOUT, sleep=1):
+        self.response_class = response_class
         self.retry = retry
         self.sleep = sleep
 
     def __call__(self, viewfunc):
-        response = Response()
+        response = self.response_class()
 
         if self.retry is not None:
             response.set_retry(self.retry)
@@ -73,19 +75,19 @@ class StreamSse(object):
         return _inner
 
 
-def is_sse_method(retry=DEFAULT_RETRY_TIMEOUT):
+def is_sse_method(response_class=Response, retry=DEFAULT_RETRY_TIMEOUT):
     """
     Declare class view method as sse method.
     """
 
     if isinstance(retry, (types.FunctionType, types.MethodType)):
-        return Sse()(retry)
+        return Sse(response_class=response_class)(retry)
     
-    return Sse(retry)
+    return Sse(response_class=response_class, retry=retry)
 
 
-def is_stream_sse_method(retry=DEFAULT_RETRY_TIMEOUT, sleep=DEFAULT_SLEEP):
+def is_stream_sse_method(response_class=Response, retry=DEFAULT_RETRY_TIMEOUT, sleep=DEFAULT_SLEEP):
     """
     Declare class view method as sse stream method.
     """
-    return StreamSse(retry=retry, sleep=sleep)
+    return StreamSse(response_class=response_class, retry=retry, sleep=sleep)

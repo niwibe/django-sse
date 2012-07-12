@@ -8,6 +8,10 @@ import io
 import re
 import uuid
 
+import json
+import threading
+
+
 DEFAULT_RETRY_TIMEOUT = getattr(settings, 'DJANGO_SSE_DEFAULT_RETRY', 2000)
 DEFAULT_SLEEP = getattr(settings, 'DJANGO_SSE_DEFAULT_SLEEP', 1)
 
@@ -104,3 +108,24 @@ class Response(object):
         """
 
         return self.last_id is None
+
+
+class RedisPubSubResponse(Response):
+    def __init__(self, *args, **kwargs):
+        super(RedisPubSubResponse, self).__init__(*args, **kwargs)
+
+        t1 = threading.Thread(target=self.listener)
+        t1.start()
+
+    def listener(self):
+        from django_sse.utils import redis_connection
+
+        r = redis_connection()
+        r = r.pubsub()
+
+        r.subscribe('sse')
+
+        for m in r.listen():
+            if m['type'] == 'message':
+                data = json.loads(m['data'])
+                self.add_message(*data)
