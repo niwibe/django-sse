@@ -27,6 +27,7 @@ setup(
     include_package_data = True,
     install_requires=[
         'distribute',
+        'sse',
     ],
     setup_requires = [
         'versiontools >= 1.8',
