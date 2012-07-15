@@ -57,10 +57,12 @@ class ConnectionPoolManager(object):
 
 
 class RedisQueueView(BaseSseView):
+    redis_channel = DEFAULT_CHANNEL
+
     def iterator(self):
         connection = _connect()
         pubsub = connection.pubsub()
-        pubsub.subscribe(DEFAULT_CHANNEL)
+        pubsub.subscribe(self.get_redis_channel())
 
         for message in pubsub.listen():
             if message['type'] == 'message':
@@ -68,15 +70,18 @@ class RedisQueueView(BaseSseView):
                 self.sse.add_message(event, data)
                 yield
 
+    def get_redis_channel(self):
+        return self.redis_channel
+
 
 def _connect():
     pool = ConnectionPoolManager.connection_pool(**CONNECTION_KWARGS)
     return Redis(connection_pool=pool)
 
 
-def send_event(event_name, data):
+def send_event(event_name, data, channel=DEFAULT_CHANNEL):
     connection = _connect()
-    connection.publish(DEFAULT_CHANNEL, json.dumps([event_name, data]))
+    connection.publish(channel, json.dumps([event_name, data]))
 
 
 __all__ = ['send_event', 'RedisQueueView']
