@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from django.views.generic import View
+from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
+from django.utils.decorators import method_decorator
 from sse import Sse
 
 
@@ -20,7 +22,8 @@ class BaseSseView(View):
             for bufferitem in self.sse:
                 yield bufferitem
 
-    def get(self, request, *args, **kwargs):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
         self.sse = Sse()
 
         response = HttpResponse(self._iterator(), content_type="text/event-stream")
