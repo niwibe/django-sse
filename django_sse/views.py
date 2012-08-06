@@ -26,6 +26,10 @@ class BaseSseView(View):
     def dispatch(self, request, *args, **kwargs):
         self.sse = Sse()
 
+        self.request = request
+        self.args = args
+        self.kwargs = kwargs
+
         response = HttpResponse(self._iterator(), content_type="text/event-stream")
         response['Cache-Control'] = 'no-cache'
         response['Software'] = 'django-sse'
