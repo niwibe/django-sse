@@ -66,7 +66,7 @@ class RedisQueueView(BaseSseView):
 
         for message in pubsub.listen():
             if message['type'] == 'message':
-                event, data = json.loads(message['data'])
+                event, data = json.loads(message['data'].decode('utf-8'))
                 self.sse.add_message(event, data)
                 yield
 
