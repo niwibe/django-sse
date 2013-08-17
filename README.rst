@@ -86,8 +86,8 @@ with a simple api:
 
 
 
-Can subscribe to a channel dinamicaly with some parameter on url?
------------------------------------------------------------------
+Can subscribe to a channel dynamically with some parameter on url?
+------------------------------------------------------------------
 
 Yes, you need create a subclass of ``RedisQueueView`` and overwrite the method ``get_redis_channel``.
 Example:
