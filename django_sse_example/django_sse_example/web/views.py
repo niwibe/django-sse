@@ -22,8 +22,9 @@ class Home2(View):
 
 
 class MySseEvents(BaseSseView):
+    DELAY_BETWEEN_MESSAGES = 1
     def iterator(self):
         while True:
             self.sse.add_message("date", unicode(now()))
-            time.sleep(1)
+            time.sleep(MySseEvents.DELAY_BETWEEN_MESSAGES)
             yield
