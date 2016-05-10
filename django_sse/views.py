@@ -10,7 +10,7 @@ try:
     else:
         from django.http.response import StreamingHttpResponse as HttpResponse
 except ImportError:
-    from django.http import HttpResponse
+    from django.http import HttpResponse, StreamingHttpResponse
 
 from django.utils.decorators import method_decorator
 from sse import Sse
@@ -39,7 +39,7 @@ class BaseSseView(View):
         self.args = args
         self.kwargs = kwargs
 
-        response = HttpResponse(self._iterator(), content_type="text/event-stream")
+        response = StreamingHttpResponse(self._iterator(), content_type="text/event-stream")
         response['Cache-Control'] = 'no-cache'
         response['Software'] = 'django-sse'
         return response
