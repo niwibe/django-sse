@@ -6,11 +6,11 @@ from django.views.decorators.csrf import csrf_exempt
 
 try:
     if django.VERSION < (1, 7):
-        from django.http import StreamingHttpResponse as HttpResponse
+        from django.http import StreamingHttpResponse
     else:
-        from django.http.response import StreamingHttpResponse as HttpResponse
+        from django.http.response import StreamingHttpResponse
 except ImportError:
-    from django.http import HttpResponse, StreamingHttpResponse
+    from django.http import StreamingHttpResponse
 
 from django.utils.decorators import method_decorator
 from sse import Sse
